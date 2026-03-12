@@ -97,22 +97,24 @@
 
         <!-- Notify Me Form -->
         <div class="max-w-md mx-auto mb-8">
-            <form class="flex flex-col sm:flex-row gap-3" onsubmit="handleSubmit(event)">
+            <div class="flex flex-col sm:flex-row gap-3">
                 <input 
+                    id="email-input"
                     type="email" 
                     placeholder="Enter your email address" 
                     required
                     class="flex-1 px-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-green-700 focus:ring-2 focus:ring-green-200 transition-all"
                 />
                 <button 
-                    type="submit"
+                    id="subscribe-btn"
+                    onclick="handleSubmit()"
                     class="px-8 py-3 rounded-full text-white font-medium transition-all hover:opacity-90 hover:shadow-lg whitespace-nowrap"
                     style="background-color: #8B9D83;"
                 >
                     Notify Me
                 </button>
-            </form>
-            <p class="text-sm text-gray-500 text-center mt-4">
+            </div>
+            <p id="form-message" class="text-sm text-gray-500 text-center mt-4">
                 Be the first to know when we launch
             </p>
         </div>
@@ -127,17 +129,75 @@
 
         <!-- Footer -->
         <div class="text-center mt-16 text-gray-500 text-sm">
-            <p>&copy; 2025 Promise Organics. All rights reserved.</p>
+            <p>&copy; 2025 Promise Organics. All rights reserved.<br/>Durban, South Africa</p>
         </div>
     </div>
 
     <script>
-        function handleSubmit(event) {
-            event.preventDefault();
-            const email = event.target.querySelector('input[type="email"]').value;
-            alert(`Thank you! We'll notify you at ${email} when we launch.`);
-            event.target.reset();
+        async function handleSubmit() {
+            const input = document.getElementById('email-input');
+            const button = document.getElementById('subscribe-btn');
+            const message = document.getElementById('form-message');
+            const email = input.value.trim();
+
+            // Basic validation
+            if (!email || !email.includes('@')) {
+                message.textContent = 'Please enter a valid email address.';
+                message.style.color = '#e53e3e';
+                return;
+            }
+
+            // Loading state
+            button.textContent = 'Subscribing...';
+            button.disabled = true;
+            message.textContent = '';
+            message.style.color = '';
+
+            try {
+                const response = await fetch(
+                    'https://xsxpikmbjupcxfemggqh.supabase.co/functions/v1/subscribe',
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success state
+                    button.textContent = "✓ You're on the list!";
+                    button.style.backgroundColor = '#6a7f62';
+                    input.value = '';
+                    input.disabled = true;
+                    message.textContent = "🌿 Thank you! Check your inbox for a welcome email from us.";
+                    message.style.color = '#4a7c59';
+                } else if (response.status === 409) {
+                    message.textContent = '💚 This email is already subscribed. See you at launch!';
+                    message.style.color = '#8B9D83';
+                    button.textContent = 'Notify Me';
+                    button.disabled = false;
+                } else {
+                    message.textContent = data.error || 'Something went wrong. Please try again.';
+                    message.style.color = '#e53e3e';
+                    button.textContent = 'Notify Me';
+                    button.disabled = false;
+                }
+            } catch (err) {
+                message.textContent = 'Network error. Please try again.';
+                message.style.color = '#e53e3e';
+                button.textContent = 'Notify Me';
+                button.disabled = false;
+            }
         }
+
+        // Allow Enter key to trigger subscription
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') handleSubmit();
+            });
+        });
     </script>
 
 </body>

@@ -1,0 +1,18 @@
+
+
+ --- SUPABASE ---
+SUPABASE_PROJECT_ID=your_supabase_project_id
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+ --- SUPABASE EDGE FUNCTION ---
+SUBSCRIBE_ENDPOINT=your_supabase_project_url/functions/v1/subscribe
+
+ --- ZOHO MAIL (SMTP) ---
+ZOHO_SMTP_HOST=smtp.zoho.com
+ZOHO_SMTP_PORT=465
+ZOHO_SMTP_USER=your_zoho_email
+ZOHO_SMTP_APP_PASSWORD=your_zoho_app_password
+
+ --- SITE ---
+SITE_URL=https://www.promiseorganics.co.za
